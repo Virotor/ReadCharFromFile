@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -59,13 +60,35 @@ namespace ReadCharFromFile
             return dirPath;
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private async void button2_Click(object sender, EventArgs e)
         {
+            pathToSaveDirectory = pathToSaveDir.Text;
+            pathToRootDirectory = pathToFile.Text;
+
             if (pathToSaveDirectory.Equals(string.Empty))
             {
                 pathToSaveDirectory = pathToRootDirectory;
                 pathToSaveDir.Text = pathToSaveDirectory;
             }
+            uint countOfThread;
+            if(uint.TryParse(textBox1.Text,out countOfThread))
+            {
+                label4.Text = "";
+                SearcherDirectory searcherDirectory = new SearcherDirectory(pathToSaveDirectory,pathToRootDirectory);
+                searcherDirectory.NumberOfThread =(int) countOfThread;
+                await Task.Run( ()=> searcherDirectory.SearchDirectory());
+                label4.Text = "Ready";
+            }
+            else
+            {
+                ToolTip toolTip = new ToolTip();
+                toolTip.Active = true;
+       
+                toolTip.ToolTipIcon = ToolTipIcon.Error;
+                toolTip.ShowAlways = true;
+                toolTip.SetToolTip(label3, "Введенно неверное число потоков");
+            }
+
 
         }
     }
